@@ -1,0 +1,145 @@
+- Phase 1: Data Pipeline Enhancement (Week 1)
+  - Create ml/data/loader.py
+    - Refactor scripts/db_connect.py into reusable DataLoader class
+    - Add data validation and error handling for CSV files
+    - Create train/test splitting functionality with random_state
+    - Handle missing values systematically with imputation strategies
+    - Add data caching to improve iteration speed
+  - Create ml/data/preprocessor.py
+    - Extract user preference profiles from rating history
+    - Normalize whiskey features (proof, complexity, finish_duration)
+    - Create interaction features (user × whiskey attributes)
+    - Implement feature scaling for ML models
+    - Add feature selection based on existing linear model insights
+  - Create ml/__init__.py and subdirectory structure
+    - Set up proper Python package structure
+    - Add import statements and version info
+    - Create data/, models/, evaluation/, utils/ subdirectories
+- Phase 2: Content-Based Model (Week 1)
+  - Create ml/models/linear_baseline.py
+    - Refactor scripts/linear_model.py into BaselineModel class
+    - Add save/load functionality for trained models
+    - Maintain existing R² = 0.765 performance benchmark
+    - Add prediction methods for single whiskey recommendations
+    - Include feature importance extraction methods
+  - Create ml/models/content_based.py
+    - Build ContentBasedRecommender using proven features
+    - Implement whiskey similarity calculations (cosine, euclidean)
+    - Create recommendation methods returning ranked lists
+    - Add explanation generation for why whiskeys were recommended
+    - Handle edge cases for whiskeys with missing features
+  - Create ml/models/__init__.py
+    - Set up model package structure
+    - Add base model abstract class for consistency
+- Phase 3: Collaborative Filtering (Week 2)
+  - Create ml/models/collaborative.py
+    - Build CollaborativeRecommender using 58% data density
+    - Implement user similarity matrix with cosine similarity
+    - Create neighborhood-based prediction algorithms
+    - Add cold start handling for users with <3 ratings
+    - Implement item-based collaborative filtering as backup
+  - Create ml/utils/similarity.py
+    - Implement efficient user-user similarity calculations
+    - Add item-item similarity functions for future use
+    - Create sparse matrix optimization for memory efficiency
+    - Add similarity caching for performance improvement
+  - Create ml/utils/__init__.py
+    - Set up utilities package structure
+- Phase 4: Hybrid Integration (Week 1)
+  - Create ml/models/hybrid.py
+    - Build HybridRecommender combining collaborative + content
+    - Implement weighted combination starting with 60/40 split
+    - Add dynamic weight adjustment based on data availability
+    - Create fallback strategies for edge cases (new users/items)
+    - Add ensemble methods for improved accuracy
+  - Create ml/evaluation/metrics.py
+    - Implement RMSE, MAE, Precision@K, Recall@K metrics
+    - Add cross-validation framework for model comparison
+    - Create A/B testing infrastructure for weight optimization
+    - Add business metrics tracking (diversity, novelty)
+    - Include statistical significance testing
+  - Create ml/evaluation/__init__.py
+    - Set up evaluation package structure
+- Phase 5: API Development (Week 2)
+  - Create api/main.py
+    - Set up FastAPI application with proper middleware
+    - Add model loading and caching on startup
+    - Implement health checks and monitoring endpoints
+    - Add response caching with configurable TTL
+    - Include request/response logging
+  - Create api/routes/recommendations.py
+    - Implement /recommend/{user_id} for personalized recommendations
+    - Add /recommend/flavor_profile for custom flavor matching
+    - Create /recommend/gift/{user_id} for gift recommendations
+    - Include pagination and filtering options
+    - Add recommendation explanations in responses
+  - Create api/routes/predictions.py
+    - Implement /predict/rating for user-whiskey rating prediction
+    - Add /predict/sensitivity for feature importance analysis
+    - Create batch prediction endpoints for efficiency
+    - Include confidence intervals in predictions
+  - Create api/schemas/models.py
+    - Define Pydantic models for all request/response schemas
+    - Add validation for user_ids, whiskey_ids, rating ranges
+    - Include error response models
+    - Add documentation strings for API docs
+  - Create api/__init__.py and middleware setup
+    - Set up API package structure
+    - Add CORS middleware for frontend integration
+    - Include rate limiting and authentication placeholders
+- Phase 6: Frontend Integration (Week 1)
+  - Update demo/ml-simulator.js
+    - Replace mock calculations with real API calls
+    - Maintain existing UI behavior and response times
+    - Add error handling for API failures
+    - Implement loading states during API requests
+    - Add retry logic for failed requests
+  - Add configuration for API endpoints
+    - Create environment-based API URL configuration
+    - Add development vs production API settings
+    - Include timeout and retry configurations
+  - Test frontend-backend integration
+    - Verify all 5 demo features work with real API
+    - Test error scenarios and fallback behavior
+    - Validate response formats match demo expectations
+- Phase 7: Testing & Validation (Week 1)
+  - Create tests/unit/
+    - Write tests for all model classes (collaborative, content, hybrid)
+    - Add data processing pipeline tests
+    - Create API endpoint unit tests
+    - Include edge case and error condition testing
+    - Add performance benchmarking tests
+  - Create tests/integration/
+    - Build end-to-end pipeline testing from data to recommendations
+    - Test full API workflows matching demo scenarios
+    - Add load testing for API performance requirements
+    - Include accuracy regression tests vs baseline model
+  - Create tests/fixtures/
+    - Generate sample datasets for consistent testing
+    - Add edge case data (sparse users, missing features)
+    - Create expected output fixtures for validation
+  - Set up continuous testing framework
+    - Add pytest configuration and test running scripts
+    - Include code coverage reporting
+    - Set up automated testing on code changes
+- Phase 8: Deployment Preparation (Week 1)
+  - Enhance config/settings.py
+    - Add environment variable configuration
+    - Include database connection settings for production
+    - Add model versioning and artifact management
+    - Create monitoring and logging configuration
+  - Create config/model_config.yaml
+    - Define hyperparameters for all models
+    - Add training configuration settings
+    - Include feature engineering parameters
+    - Set performance thresholds and alerts
+  - Update documentation
+    - Create API documentation with examples
+    - Add model retraining procedures and schedules
+    - Include monitoring and maintenance guides
+    - Document deployment and scaling procedures
+  - Prepare production deployment
+    - Create Docker configuration files
+    - Add requirements.txt with pinned versions
+    - Include environment setup scripts
+    - Create deployment verification tests
