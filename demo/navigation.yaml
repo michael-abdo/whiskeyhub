@@ -1,0 +1,182 @@
+name: "Whiskey Hub ML Demo - AI-Powered Recommendation System Workflow"
+description: "Automated testing workflow for ML-powered whiskey recommendation system demonstrating collaborative filtering, rating predictions, and personalized insights"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 15000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Homepage Navigation
+  - type: navigate
+    description: "Navigate to Whiskey Hub ML homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021932246566536616171/index.html"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for main content to load"
+    selector: ".hero-section"
+    
+  - type: assertText
+    description: "Verify main heading loaded"
+    selector: ".hero-content h1"
+    expected: "Discover Your Perfect Whiskey with AI"
+    
+  - type: click
+    description: "Click on Get Recommendations button"
+    selector: ".hero-buttons .btn-primary"
+    screenshot: true
+    
+  # Personalized Recommendations Page
+  - type: wait-for-selector
+    description: "Wait for recommendations page to load"
+    selector: ".user-profile-section"
+    
+  - type: assertText
+    description: "Verify recommendations page title"
+    selector: ".page-header h1"
+    expected: "Your Personalized Recommendations"
+    
+  - type: wait-for-selector
+    description: "Wait for ML processing to complete"
+    selector: ".recommendations-grid"
+    timeout: 5000
+    
+  - type: evaluate
+    description: "Verify recommendations loaded"
+    code: "document.querySelectorAll('.whiskey-card').length > 0"
+    
+  - type: screenshot
+    description: "Capture personalized recommendations"
+    
+  # Flavor Profile Builder
+  - type: click
+    description: "Navigate to Flavor Profile page"
+    selector: ".nav-menu a[href='flavor-profile.html']"
+    
+  - type: wait-for-selector
+    description: "Wait for flavor profile builder"
+    selector: ".flavor-sliders-section"
+    
+  - type: evaluate
+    description: "Adjust sweet preference slider"
+    code: |
+      const slider = document.getElementById('sweetSlider');
+      slider.value = 8;
+      slider.dispatchEvent(new Event('input'));
+    
+  - type: evaluate
+    description: "Add tasting note"
+    code: |
+      const input = document.getElementById('notesInput');
+      input.value = 'vanilla';
+      input.dispatchEvent(new Event('input'));
+      setTimeout(() => document.querySelector('.autocomplete-suggestion').click(), 500);
+    
+  - type: click
+    description: "Find matching whiskeys"
+    selector: ".btn-primary"
+    
+  - type: wait-for-selector
+    description: "Wait for flavor matches"
+    selector: ".results-section"
+    timeout: 3000
+    
+  - type: screenshot
+    description: "Capture flavor profile matches"
+    
+  # Rating Prediction
+  - type: click
+    description: "Navigate to Rating Predictor"
+    selector: ".nav-menu a[href='rating-prediction.html']"
+    
+  - type: wait-for-selector
+    description: "Wait for search input"
+    selector: "#whiskeySearch"
+    
+  - type: type
+    description: "Search for a whiskey"
+    selector: "#whiskeySearch"
+    text: "Lagavulin"
+    
+  - type: wait-for-selector
+    description: "Wait for search results"
+    selector: ".search-results"
+    
+  - type: click
+    description: "Select Lagavulin 16 Year"
+    selector: ".search-result-item:first-child"
+    
+  - type: wait-for-selector
+    description: "Wait for prediction to complete"
+    selector: ".prediction-result"
+    timeout: 3000
+    
+  - type: screenshot
+    description: "Capture rating prediction"
+    
+  # Sensitivity Analysis
+  - type: click
+    description: "Navigate to Taste Insights"
+    selector: ".nav-menu a[href='sensitivity-analysis.html']"
+    
+  - type: wait-for-selector
+    description: "Wait for SHAP analysis"
+    selector: "#analysisContent"
+    timeout: 4000
+    
+  - type: assertText
+    description: "Verify sensitivity analysis loaded"
+    selector: ".page-header h1"
+    expected: "Your Taste Insights"
+    
+  - type: screenshot
+    description: "Capture taste insights analysis"
+    
+  # Gift Guide
+  - type: click
+    description: "Navigate to Gift Guide"
+    selector: ".nav-menu a[href='gift-guide.html']"
+    
+  - type: wait-for-selector
+    description: "Wait for recipient selection"
+    selector: ".recipient-section"
+    
+  - type: click
+    description: "Select bourbon lover profile"
+    selector: ".recipient-card:first-child"
+    
+  - type: wait-for-selector
+    description: "Wait for gift recommendations"
+    selector: ".gift-grid"
+    timeout: 3000
+    
+  - type: evaluate
+    description: "Verify gift recommendations loaded"
+    code: "document.querySelectorAll('.gift-card').length > 0"
+    
+  - type: screenshot
+    description: "Capture gift recommendations"
+    
+  # Return to Homepage
+  - type: click
+    description: "Return to homepage"
+    selector: ".nav-menu a[href='index.html']"
+    
+  - type: wait-for-selector
+    description: "Wait for homepage to reload"
+    selector: ".hero-section"
+    
+  - type: evaluate
+    description: "Scroll to ML features section"
+    code: "document.querySelector('.ml-features-section').scrollIntoView({ behavior: 'smooth' })"
+    
+  - type: wait
+    description: "Wait for scroll animation"
+    duration: 1000
+    
+  - type: screenshot
+    description: "Capture ML technology features"

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rating Predictor - Whiskey Hub ML</title>
+    <script src="whiskey-database.js"></script>
+    <script src="ml-simulator.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS Variables */
+        :root {
+            /* Primary Colors */
+            --primary-color: #B8860B;
+            --primary-dark: #8B6508;
+            --primary-light: #DAA520;
+            
+            /* Secondary Colors */
+            --secondary-color: #2C1810;
+            --secondary-light: #4A2C1C;
+            
+            /* Accent Colors */
+            --accent-color: #FF6B35;
+            --accent-light: #FF8C42;
+            
+            /* Neutral Colors */
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --background-primary: #FAFAFA;
+            --background-secondary: #F5F5F5;
+            --white: #FFFFFF;
+            --black: #000000;
+            
+            /* Semantic Colors */
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --error: #F44336;
+            --info: #2196F3;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.2);
+            
+            /* Font Families */
+            --font-primary: 'Playfair Display', serif;
+            --font-secondary: 'Raleway', sans-serif;
+            --font-mono: 'Courier New', monospace;
+            
+            /* Font Sizes */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            
+            /* Font Weights */
+            --font-light: 300;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Line Heights */
+            --leading-tight: 1.25;
+            --leading-normal: 1.5;
+            --leading-relaxed: 1.75;
+            
+            /* Spacing Scale */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 1rem;
+            --radius-full: 9999px;
+        }
+
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;500;600;700&display=swap');
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            color: var(--text-primary);
+            background-color: var(--background-primary);
+            line-height: var(--leading-normal);
+            min-width: 1024px;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-md) var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo h1 {
+            font-family: var(--font-primary);
+            font-size: var(--text-2xl);
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-left: var(--space-sm);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: var(--font-medium);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px var(--space-lg) var(--space-3xl);
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+
+        .page-header h1 {
+            font-family: var(--font-primary);
+            font-size: var(--text-4xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-md);
+        }
+
+        .page-header p {
+            font-size: var(--text-xl);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Search Section */
+        .search-section {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .search-input-group {
+            position: relative;
+            margin-bottom: var(--space-lg);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-lg) var(--space-xl);
+            font-size: var(--text-lg);
+            border: 2px solid #E0E0E0;
+            border-radius: var(--radius-md);
+            font-family: var(--font-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+        }
+
+        .search-results {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--white);
+            border: 1px solid #E0E0E0;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .search-result-item {
+            padding: var(--space-md) var(--space-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .search-result-item:hover {
+            background-color: var(--background-secondary);
+        }
+
+        .result-name {
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .result-type {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .result-price {
+            font-weight: var(--font-medium);
+            color: var(--primary-color);
+        }
+
+        /* Selected Whiskey Section */
+        .selected-whiskey {
+            display: none;
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .whiskey-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .whiskey-visual {
+            background: linear-gradient(135deg, #FFE0B2 0%, #FFCC80 100%);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
+            height: 300px;
+        }
+
+        .whiskey-info h2 {
+            font-family: var(--font-primary);
+            font-size: var(--text-3xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-md);
+        }
+
+        .whiskey-type-badge {
+            display: inline-block;
+            background-color: var(--primary-light);
+            color: var(--white);
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-lg);
+        }
+
+        .whiskey-attributes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .attribute-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+        }
+
+        .attribute-icon {
+            font-size: var(--text-xl);
+        }
+
+        .distillers-notes {
+            background-color: var(--background-secondary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .distillers-notes h3 {
+            font-family: var(--font-primary);
+            font-size: var(--text-xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-sm);
+        }
+
+        .distillers-notes p {
+            color: var(--text-secondary);
+            font-style: italic;
+            line-height: var(--leading-relaxed);
+        }
+
+        /* Flavor Profile Chart */
+        .flavor-profile-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .tasting-notes-list {
+            background-color: var(--background-secondary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+        }
+
+        .tasting-notes-list h3 {
+            font-family: var(--font-primary);
+            font-size: var(--text-xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-md);
+        }
+
+        .notes-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+
+        .note-tag {
+            background-color: var(--white);
+            color: var(--text-secondary);
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            border: 1px solid #E0E0E0;
+        }
+
+        /* Prediction Section */
+        .prediction-section {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2xl);
+            text-align: center;
+        }
+
+        .prediction-loading {
+            display: none;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(184, 134, 11, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: var(--space-md);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .prediction-result {
+            display: none;
+        }
+
+        .predicted-rating-display {
+            font-size: 80px;
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+            line-height: 1;
+            margin-bottom: var(--space-sm);
+        }
+
+        .rating-stars {
+            font-size: var(--text-3xl);
+            color: var(--primary-color);
+            margin-bottom: var(--space-lg);
+        }
+
+        .confidence-meter {
+            max-width: 400px;
+            margin: 0 auto var(--space-lg);
+        }
+
+        .confidence-bar {
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background-color: var(--success);
+            transition: width 1s ease-out;
+        }
+
+        .confidence-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* Quick Picks */
+        .quick-picks-section {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-picks-header {
+            font-family: var(--font-primary);
+            font-size: var(--text-2xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-lg);
+        }
+
+        .quick-picks-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .quick-pick-card {
+            background-color: var(--background-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .quick-pick-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .quick-pick-icon {
+            font-size: var(--text-3xl);
+            margin-bottom: var(--space-sm);
+        }
+
+        .quick-pick-name {
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .quick-pick-type {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: var(--font-secondary);
+            font-weight: var(--font-semibold);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: var(--text-lg);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            padding: var(--space-2xl) 0;
+            margin-top: var(--space-3xl);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-2xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .footer-section h3,
+        .footer-section h4 {
+            font-family: var(--font-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-section p {
+            opacity: 0.8;
+            line-height: var(--leading-relaxed);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: var(--space-sm);
+            opacity: 0.8;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: var(--space-xl);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>Whiskey Hub ML</h1>
+                <span class="nav-tagline">AI-Powered Recommendations</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="recommendations.html" class="nav-link">Recommendations</a></li>
+                <li class="nav-item"><a href="flavor-profile.html" class="nav-link">Flavor Profile</a></li>
+                <li class="nav-item"><a href="rating-prediction.html" class="nav-link active">Rating Predictor</a></li>
+                <li class="nav-item"><a href="sensitivity-analysis.html" class="nav-link">Taste Insights</a></li>
+                <li class="nav-item"><a href="gift-guide.html" class="nav-link">Gift Guide</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Predict Your Rating</h1>
+            <p>Our ML model predicts how you'll rate any whiskey based on your taste preferences</p>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2 style="font-family: var(--font-primary); font-size: var(--text-2xl); color: var(--secondary-color); margin-bottom: var(--space-lg);">
+                Search for a Whiskey
+            </h2>
+            <div class="search-input-group">
+                <input type="text" 
+                       class="search-input" 
+                       id="whiskeySearch" 
+                       placeholder="Type whiskey name, brand, or type..."
+                       autocomplete="off">
+                <div class="search-results" id="searchResults"></div>
+            </div>
+        </div>
+
+        <!-- Selected Whiskey Section -->
+        <div class="selected-whiskey" id="selectedWhiskey">
+            <div class="whiskey-header">
+                <div class="whiskey-visual">
+                    <span>🥃</span>
+                </div>
+                <div class="whiskey-info">
+                    <h2 id="whiskeyName"></h2>
+                    <span class="whiskey-type-badge" id="whiskeyType"></span>
+                    <div class="whiskey-attributes">
+                        <div class="attribute-item">
+                            <span class="attribute-icon">🌡️</span>
+                            <span>Proof: <strong id="whiskeyProof"></strong></span>
+                        </div>
+                        <div class="attribute-item">
+                            <span class="attribute-icon">💰</span>
+                            <span>Price: <strong id="whiskeyPrice"></strong></span>
+                        </div>
+                        <div class="attribute-item">
+                            <span class="attribute-icon">🏆</span>
+                            <span>Complexity: <strong id="whiskeyComplexity"></strong>/5</span>
+                        </div>
+                        <div class="attribute-item">
+                            <span class="attribute-icon">💧</span>
+                            <span>Viscosity: <strong id="whiskeyViscosity"></strong>/5</span>
+                        </div>
+                    </div>
+                    <div class="distillers-notes">
+                        <h3>Distiller's Notes</h3>
+                        <p id="distillersNotes"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flavor Profile -->
+            <div class="flavor-profile-section">
+                <div class="chart-container">
+                    <canvas id="flavorChart"></canvas>
+                </div>
+                <div class="tasting-notes-list">
+                    <h3>Tasting Notes</h3>
+                    <div class="notes-grid" id="tastingNotes"></div>
+                </div>
+            </div>
+
+            <!-- Prediction -->
+            <div class="prediction-section">
+                <div class="prediction-loading" id="predictionLoading">
+                    <div class="loading-spinner"></div>
+                    <h3 style="color: var(--secondary-color);">Running ML Prediction Model...</h3>
+                    <p style="color: var(--text-secondary);">Analyzing flavor profile against your preferences</p>
+                </div>
+                
+                <div class="prediction-result" id="predictionResult">
+                    <h3 style="font-family: var(--font-primary); font-size: var(--text-2xl); color: var(--secondary-color); margin-bottom: var(--space-lg);">
+                        Your Predicted Rating
+                    </h3>
+                    <div class="predicted-rating-display" id="predictedRating"></div>
+                    <div class="rating-stars" id="ratingStars"></div>
+                    <div class="confidence-meter">
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                        </div>
+                        <p class="confidence-label">Model Confidence: <strong id="confidenceValue"></strong>%</p>
+                    </div>
+                    <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto;">
+                        Based on your rating history and preferences, our XGBoost model predicts you would rate this whiskey <strong id="ratingText"></strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Picks -->
+        <div class="quick-picks-section">
+            <h2 class="quick-picks-header">Quick Picks - Try These Popular Whiskeys</h2>
+            <div class="quick-picks-grid" id="quickPicks">
+                <!-- Quick picks will be populated here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Whiskey Hub ML</h3>
+                    <p>Advanced machine learning for personalized whiskey recommendations. Discover new favorites based on your unique taste profile.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <ul>
+                        <li>Personalized Recommendations</li>
+                        <li>Rating Predictions</li>
+                        <li>Flavor Profile Matching</li>
+                        <li>Sensitivity Analysis</li>
+                        <li>Gift Suggestions</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Technology</h4>
+                    <ul>
+                        <li>Machine Learning Models</li>
+                        <li>Collaborative Filtering</li>
+                        <li>Content-Based Analysis</li>
+                        <li>SHAP Explanations</li>
+                        <li>Real-Time Processing</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Whiskey Hub ML Demo. Powered by advanced ML algorithms.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let flavorChart;
+        let selectedWhiskeyData = null;
+        const db = JSON.parse(localStorage.getItem('whiskeyDatabase'));
+
+        // Initialize page
+        function initializePage() {
+            setupSearch();
+            loadQuickPicks();
+        }
+
+        // Setup search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('whiskeySearch');
+            const searchResults = document.getElementById('searchResults');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+
+                if (query.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    const results = db.searchWhiskeys(query);
+                    displaySearchResults(results.slice(0, 6));
+                }, 300);
+            });
+
+            // Hide results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item">No whiskeys found</div>';
+                searchResults.style.display = 'block';
+                return;
+            }
+
+            searchResults.innerHTML = results.map(whiskey => `
+                <div class="search-result-item" onclick="selectWhiskey(${whiskey.id})">
+                    <div>
+                        <div class="result-name">${whiskey.name}</div>
+                        <div class="result-type">${whiskey.type}</div>
+                    </div>
+                    <div class="result-price">$${whiskey.price}</div>
+                </div>
+            `).join('');
+
+            searchResults.style.display = 'block';
+        }
+
+        // Select whiskey
+        async function selectWhiskey(whiskeyId) {
+            selectedWhiskeyData = db.getWhiskeyById(whiskeyId);
+            
+            // Clear search
+            document.getElementById('whiskeySearch').value = '';
+            document.getElementById('searchResults').style.display = 'none';
+            
+            // Display whiskey details
+            displayWhiskeyDetails();
+            
+            // Create flavor chart
+            createFlavorChart();
+            
+            // Show selected whiskey section
+            document.getElementById('selectedWhiskey').style.display = 'block';
+            
+            // Run prediction
+            await runPrediction();
+        }
+
+        // Display whiskey details
+        function displayWhiskeyDetails() {
+            document.getElementById('whiskeyName').textContent = selectedWhiskeyData.name;
+            document.getElementById('whiskeyType').textContent = selectedWhiskeyData.type;
+            document.getElementById('whiskeyProof').textContent = selectedWhiskeyData.proof;
+            document.getElementById('whiskeyPrice').textContent = `$${selectedWhiskeyData.price}`;
+            document.getElementById('whiskeyComplexity').textContent = selectedWhiskeyData.complexity;
+            document.getElementById('whiskeyViscosity').textContent = selectedWhiskeyData.viscosity;
+            document.getElementById('distillersNotes').textContent = selectedWhiskeyData.distillersNotes;
+            
+            // Display tasting notes
+            const notesContainer = document.getElementById('tastingNotes');
+            notesContainer.innerHTML = selectedWhiskeyData.tastingNotes.map(note => 
+                `<span class="note-tag">${note}</span>`
+            ).join('');
+        }
+
+        // Create flavor chart
+        function createFlavorChart() {
+            const ctx = document.getElementById('flavorChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (flavorChart) {
+                flavorChart.destroy();
+            }
+            
+            const userPrefs = db.getAverageUserPreferences('demo_user');
+            
+            flavorChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Sweet', 'Fruity', 'Floral', 'Spicy', 'Raw', 'Earthy', 'Dark', 'Light'],
+                    datasets: [{
+                        label: 'This Whiskey',
+                        data: Object.values(selectedWhiskeyData.flavorProfile),
+                        backgroundColor: 'rgba(184, 134, 11, 0.2)',
+                        borderColor: '#B8860B',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#B8860B'
+                    }, {
+                        label: 'Your Preferences',
+                        data: Object.values(userPrefs),
+                        backgroundColor: 'rgba(255, 107, 53, 0.2)',
+                        borderColor: '#FF6B35',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#FF6B35'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                stepSize: 2
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Run prediction
+        async function runPrediction() {
+            const predictionLoading = document.getElementById('predictionLoading');
+            const predictionResult = document.getElementById('predictionResult');
+            
+            // Show loading
+            predictionLoading.style.display = 'block';
+            predictionResult.style.display = 'none';
+            
+            // Simulate ML processing
+            await MLSimulator.simulateProcessing(1500, 2500);
+            
+            // Get prediction
+            const userPrefs = db.getAverageUserPreferences('demo_user');
+            const predictedRating = MLSimulator.predictRating(userPrefs, selectedWhiskeyData);
+            
+            // Display results
+            displayPredictionResults(predictedRating);
+            
+            // Hide loading, show results
+            predictionLoading.style.display = 'none';
+            predictionResult.style.display = 'block';
+        }
+
+        // Display prediction results
+        function displayPredictionResults(rating) {
+            document.getElementById('predictedRating').textContent = rating.toFixed(1);
+            document.getElementById('ratingStars').innerHTML = getStars(rating);
+            
+            // Confidence calculation (simulated)
+            const confidence = 85 + Math.floor(Math.random() * 10);
+            document.getElementById('confidenceValue').textContent = confidence;
+            
+            // Animate confidence bar
+            setTimeout(() => {
+                document.getElementById('confidenceFill').style.width = confidence + '%';
+            }, 100);
+            
+            // Rating text
+            let ratingText;
+            if (rating >= 4.5) ratingText = 'exceptionally high';
+            else if (rating >= 4) ratingText = 'very favorably';
+            else if (rating >= 3.5) ratingText = 'positively';
+            else if (rating >= 3) ratingText = 'moderately';
+            else ratingText = 'lower than average';
+            
+            document.getElementById('ratingText').textContent = ratingText;
+        }
+
+        // Get star rating display
+        function getStars(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+            const emptyStars = 5 - fullStars - halfStar;
+            
+            return '★'.repeat(fullStars) + (halfStar ? '☆' : '') + '☆'.repeat(emptyStars);
+        }
+
+        // Load quick picks
+        function loadQuickPicks() {
+            const popularWhiskeys = [
+                db.getWhiskeyById(2),  // Buffalo Trace
+                db.getWhiskeyById(8),  // Macallan 12
+                db.getWhiskeyById(4),  // Lagavulin 16
+                db.getWhiskeyById(10), // Redbreast 12
+                db.getWhiskeyById(1),  // Glenfiddich 12
+                db.getWhiskeyById(14)  // Four Roses Single Barrel
+            ];
+            
+            const quickPicksContainer = document.getElementById('quickPicks');
+            quickPicksContainer.innerHTML = popularWhiskeys.map(whiskey => `
+                <div class="quick-pick-card" onclick="selectWhiskey(${whiskey.id})">
+                    <div class="quick-pick-icon">🥃</div>
+                    <div class="quick-pick-name">${whiskey.name}</div>
+                    <div class="quick-pick-type">${whiskey.type}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', initializePage);
+    </script>
+</body>
+</html>

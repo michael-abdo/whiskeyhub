@@ -1,0 +1,1 @@
+﻿id,first_name,last_name,email,username,dob,gender,phone,country_code,address,city,state,zip_code,description,email_verified_at,password,remember_token,profile_photo_path,social_profile_photo,provider,provider_id,device_token,device_type,accept_terms,active,created_at,updated_at,deleted_at

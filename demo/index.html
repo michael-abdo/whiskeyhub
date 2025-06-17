@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whiskey Hub ML - AI-Powered Whiskey Recommendations</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            /* Primary Colors */
+            --primary-color: #B8860B;
+            --primary-dark: #8B6508;
+            --primary-light: #DAA520;
+            
+            /* Secondary Colors */
+            --secondary-color: #2C1810;
+            --secondary-light: #4A2C1C;
+            
+            /* Accent Colors */
+            --accent-color: #FF6B35;
+            --accent-light: #FF8C42;
+            
+            /* Neutral Colors */
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --background-primary: #FAFAFA;
+            --background-secondary: #F5F5F5;
+            --white: #FFFFFF;
+            --black: #000000;
+            
+            /* Semantic Colors */
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --error: #F44336;
+            --info: #2196F3;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.2);
+            
+            /* Font Families */
+            --font-primary: 'Playfair Display', serif;
+            --font-secondary: 'Raleway', sans-serif;
+            --font-mono: 'Courier New', monospace;
+            
+            /* Font Sizes */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            
+            /* Font Weights */
+            --font-light: 300;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Line Heights */
+            --leading-tight: 1.25;
+            --leading-normal: 1.5;
+            --leading-relaxed: 1.75;
+            
+            /* Spacing Scale */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 1rem;
+            --radius-full: 9999px;
+        }
+
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;500;600;700&display=swap');
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            color: var(--text-primary);
+            background-color: var(--background-primary);
+            line-height: var(--leading-normal);
+            min-width: 1024px;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-md) var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo h1 {
+            font-family: var(--font-primary);
+            font-size: var(--text-2xl);
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-left: var(--space-sm);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: var(--font-medium);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            margin-top: 80px;
+            padding: var(--space-3xl) 0;
+            background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3xl);
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-family: var(--font-primary);
+            font-size: var(--text-5xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-lg);
+            line-height: var(--leading-tight);
+        }
+
+        .hero-content h1 span {
+            color: var(--primary-color);
+        }
+
+        .hero-content p {
+            font-size: var(--text-xl);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xl);
+            line-height: var(--leading-relaxed);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .btn {
+            font-family: var(--font-secondary);
+            font-weight: var(--font-semibold);
+            padding: var(--space-md) var(--space-xl);
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-size: var(--text-lg);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .hero-visual {
+            position: relative;
+        }
+
+        .hero-stats {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: var(--space-lg);
+            background-color: var(--background-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        .stat-value {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: var(--space-3xl) 0;
+            background-color: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+
+        .section-header h2 {
+            font-family: var(--font-primary);
+            font-size: var(--text-4xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-md);
+        }
+
+        .section-header p {
+            font-size: var(--text-xl);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+        }
+
+        .feature-card {
+            background-color: var(--background-secondary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--space-lg);
+            background-color: var(--primary-color);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-3xl);
+            color: var(--white);
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-primary);
+            font-size: var(--text-2xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-md);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: var(--leading-relaxed);
+        }
+
+        /* ML Features Section */
+        .ml-features-section {
+            padding: var(--space-3xl) 0;
+            background-color: var(--background-secondary);
+        }
+
+        .ml-features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-2xl);
+        }
+
+        .ml-feature-card {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .ml-feature-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .ml-feature-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .ml-feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--accent-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-2xl);
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        .ml-feature-card h3 {
+            font-family: var(--font-primary);
+            font-size: var(--text-2xl);
+            color: var(--secondary-color);
+        }
+
+        .ml-feature-card p {
+            color: var(--text-secondary);
+            line-height: var(--leading-relaxed);
+            margin-bottom: var(--space-lg);
+        }
+
+        .ml-tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+        }
+
+        .tech-tag {
+            background-color: var(--background-secondary);
+            color: var(--text-secondary);
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: var(--space-3xl) 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .cta-content h2 {
+            font-family: var(--font-primary);
+            font-size: var(--text-4xl);
+            margin-bottom: var(--space-lg);
+        }
+
+        .cta-content p {
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-xl);
+            opacity: 0.9;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: var(--white);
+        }
+
+        .btn-accent:hover {
+            background-color: var(--accent-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            padding: var(--space-2xl) 0;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-2xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .footer-section h3,
+        .footer-section h4 {
+            font-family: var(--font-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-section p {
+            opacity: 0.8;
+            line-height: var(--leading-relaxed);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: var(--space-sm);
+            opacity: 0.8;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: var(--space-xl);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.6;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>Whiskey Hub ML</h1>
+                <span class="nav-tagline">AI-Powered Recommendations</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link active">Home</a></li>
+                <li class="nav-item"><a href="recommendations.html" class="nav-link">Recommendations</a></li>
+                <li class="nav-item"><a href="flavor-profile.html" class="nav-link">Flavor Profile</a></li>
+                <li class="nav-item"><a href="rating-prediction.html" class="nav-link">Rating Predictor</a></li>
+                <li class="nav-item"><a href="sensitivity-analysis.html" class="nav-link">Taste Insights</a></li>
+                <li class="nav-item"><a href="gift-guide.html" class="nav-link">Gift Guide</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content fade-in">
+                <h1>Discover Your Perfect <span>Whiskey</span> with AI</h1>
+                <p>Advanced machine learning algorithms analyze your unique taste preferences to recommend whiskeys you'll love. From personalized suggestions to flavor profile matching, experience the future of whiskey discovery.</p>
+                <div class="hero-buttons">
+                    <a href="recommendations.html" class="btn btn-primary">Get Recommendations</a>
+                    <a href="flavor-profile.html" class="btn btn-secondary">Build Your Profile</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-stats float">
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <span class="stat-value">10K+</span>
+                            <span class="stat-label">Whiskeys</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">95%</span>
+                            <span class="stat-label">Accuracy</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">8</span>
+                            <span class="stat-label">Flavor Categories</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">ML</span>
+                            <span class="stat-label">Powered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features Section -->
+    <section class="features-section">
+        <div class="section-header">
+            <h2>Intelligent Whiskey Discovery</h2>
+            <p>Powered by advanced machine learning models trained on extensive tasting data</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card" onclick="window.location.href='recommendations.html'">
+                <div class="feature-icon">🥃</div>
+                <h3>Smart Recommendations</h3>
+                <p>Get personalized whiskey suggestions based on your tasting history and preferences using collaborative filtering algorithms.</p>
+            </div>
+            <div class="feature-card" onclick="window.location.href='rating-prediction.html'">
+                <div class="feature-icon">⭐</div>
+                <h3>Rating Predictions</h3>
+                <p>Know how you'll rate a whiskey before you try it. Our ML model predicts your personal rating with 95% accuracy.</p>
+            </div>
+            <div class="feature-card" onclick="window.location.href='flavor-profile.html'">
+                <div class="feature-icon">🎯</div>
+                <h3>Flavor Matching</h3>
+                <p>Define your ideal flavor profile and instantly find whiskeys that match your exact taste preferences.</p>
+            </div>
+            <div class="feature-card" onclick="window.location.href='sensitivity-analysis.html'">
+                <div class="feature-icon">📊</div>
+                <h3>Taste Insights</h3>
+                <p>Discover which flavor categories influence your ratings most with SHAP-powered sensitivity analysis.</p>
+            </div>
+            <div class="feature-card" onclick="window.location.href='gift-guide.html'">
+                <div class="feature-icon">🎁</div>
+                <h3>Gift Guide</h3>
+                <p>Find the perfect whiskey gift for someone else based on their unique tasting history and preferences.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3>Real-Time Updates</h3>
+                <p>Recommendations improve with every rating you provide, creating an increasingly personalized experience.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ML Features Section -->
+    <section class="ml-features-section">
+        <div class="section-header">
+            <h2>Advanced ML Technology</h2>
+            <p>State-of-the-art machine learning models power every recommendation</p>
+        </div>
+        <div class="ml-features-grid">
+            <div class="ml-feature-card">
+                <div class="ml-feature-header">
+                    <div class="ml-feature-icon">🤖</div>
+                    <h3>Hybrid Recommendation Engine</h3>
+                </div>
+                <p>Combines collaborative and content-based filtering techniques to deliver highly accurate recommendations. Analyzes both user behavior patterns and whiskey characteristics including flavor profiles, proof, viscosity, and complexity.</p>
+                <div class="ml-tech-tags">
+                    <span class="tech-tag">Collaborative Filtering</span>
+                    <span class="tech-tag">Content-Based</span>
+                    <span class="tech-tag">Matrix Factorization</span>
+                </div>
+            </div>
+            <div class="ml-feature-card">
+                <div class="ml-feature-header">
+                    <div class="ml-feature-icon">🧮</div>
+                    <h3>Gradient Boosting Models</h3>
+                </div>
+                <p>Utilizes XGBoost and LightGBM for precise rating predictions. Models are trained on user tasting data, distiller's notes, and comprehensive whiskey metadata to predict how you'll rate any whiskey.</p>
+                <div class="ml-tech-tags">
+                    <span class="tech-tag">XGBoost</span>
+                    <span class="tech-tag">LightGBM</span>
+                    <span class="tech-tag">Scikit-Learn</span>
+                </div>
+            </div>
+            <div class="ml-feature-card">
+                <div class="ml-feature-header">
+                    <div class="ml-feature-icon">🔍</div>
+                    <h3>SHAP Explainability</h3>
+                </div>
+                <p>Provides transparent insights into which flavor attributes drive your preferences. Understand exactly why certain whiskeys are recommended and which characteristics influence your ratings most.</p>
+                <div class="ml-tech-tags">
+                    <span class="tech-tag">SHAP Values</span>
+                    <span class="tech-tag">Feature Attribution</span>
+                    <span class="tech-tag">Interpretable ML</span>
+                </div>
+            </div>
+            <div class="ml-feature-card">
+                <div class="ml-feature-header">
+                    <div class="ml-feature-icon">⚡</div>
+                    <h3>Real-Time Processing</h3>
+                </div>
+                <p>Fast API endpoints deliver instant predictions and recommendations. Scalable architecture ensures smooth performance as your tasting history grows and preferences evolve.</p>
+                <div class="ml-tech-tags">
+                    <span class="tech-tag">FastAPI</span>
+                    <span class="tech-tag">Serverless</span>
+                    <span class="tech-tag">Low Latency</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Discover Your Perfect Whiskey?</h2>
+            <p>Let our advanced ML algorithms guide you to whiskeys you'll love</p>
+            <a href="recommendations.html" class="btn btn-accent">Start Your Journey</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Whiskey Hub ML</h3>
+                    <p>Advanced machine learning for personalized whiskey recommendations. Discover new favorites based on your unique taste profile.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <ul>
+                        <li>Personalized Recommendations</li>
+                        <li>Rating Predictions</li>
+                        <li>Flavor Profile Matching</li>
+                        <li>Sensitivity Analysis</li>
+                        <li>Gift Suggestions</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Technology</h4>
+                    <ul>
+                        <li>Machine Learning Models</li>
+                        <li>Collaborative Filtering</li>
+                        <li>Content-Based Analysis</li>
+                        <li>SHAP Explanations</li>
+                        <li>Real-Time Processing</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Whiskey Hub ML Demo. Powered by advanced ML algorithms.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+                navbar.style.boxShadow = 'var(--shadow-md)';
+            } else {
+                navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = 'var(--shadow-sm)';
+            }
+        });
+
+        // Add fade-in animation to elements as they appear
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all feature cards and ml feature cards
+        document.querySelectorAll('.feature-card, .ml-feature-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

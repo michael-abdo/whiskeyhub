@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Recommendations - Whiskey Hub ML</title>
+    <script src="whiskey-database.js"></script>
+    <script src="ml-simulator.js"></script>
+    <style>
+        /* CSS Variables */
+        :root {
+            /* Primary Colors */
+            --primary-color: #B8860B;
+            --primary-dark: #8B6508;
+            --primary-light: #DAA520;
+            
+            /* Secondary Colors */
+            --secondary-color: #2C1810;
+            --secondary-light: #4A2C1C;
+            
+            /* Accent Colors */
+            --accent-color: #FF6B35;
+            --accent-light: #FF8C42;
+            
+            /* Neutral Colors */
+            --text-primary: #1A1A1A;
+            --text-secondary: #666666;
+            --text-light: #999999;
+            --background-primary: #FAFAFA;
+            --background-secondary: #F5F5F5;
+            --white: #FFFFFF;
+            --black: #000000;
+            
+            /* Semantic Colors */
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --error: #F44336;
+            --info: #2196F3;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.2);
+            
+            /* Font Families */
+            --font-primary: 'Playfair Display', serif;
+            --font-secondary: 'Raleway', sans-serif;
+            --font-mono: 'Courier New', monospace;
+            
+            /* Font Sizes */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            
+            /* Font Weights */
+            --font-light: 300;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Line Heights */
+            --leading-tight: 1.25;
+            --leading-normal: 1.5;
+            --leading-relaxed: 1.75;
+            
+            /* Spacing Scale */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 1rem;
+            --radius-full: 9999px;
+        }
+
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@300;400;500;600;700&display=swap');
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            color: var(--text-primary);
+            background-color: var(--background-primary);
+            line-height: var(--leading-normal);
+            min-width: 1024px;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-md) var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo h1 {
+            font-family: var(--font-primary);
+            font-size: var(--text-2xl);
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .nav-tagline {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-left: var(--space-sm);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: var(--font-medium);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px var(--space-lg) var(--space-3xl);
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+
+        .page-header h1 {
+            font-family: var(--font-primary);
+            font-size: var(--text-4xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-md);
+        }
+
+        .page-header p {
+            font-size: var(--text-xl);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* User Profile Section */
+        .user-profile-section {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .profile-info h2 {
+            font-family: var(--font-primary);
+            font-size: var(--text-2xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-xs);
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        /* ML Status */
+        .ml-status {
+            background-color: var(--background-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+            text-align: center;
+        }
+
+        .ml-status.loading {
+            background-color: #FFF3E0;
+        }
+
+        .ml-status.ready {
+            background-color: #E8F5E9;
+        }
+
+        .status-icon {
+            font-size: var(--text-3xl);
+            margin-bottom: var(--space-md);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(184, 134, 11, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: var(--space-md);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Recommendations Grid */
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        /* Whiskey Card */
+        .whiskey-card {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .whiskey-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .whiskey-image {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, #FFE0B2 0%, #FFCC80 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-5xl);
+        }
+
+        .recommendation-badge {
+            position: absolute;
+            top: var(--space-md);
+            right: var(--space-md);
+            background-color: var(--accent-color);
+            color: var(--white);
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+        }
+
+        .whiskey-details {
+            padding: var(--space-lg);
+        }
+
+        .whiskey-name {
+            font-family: var(--font-primary);
+            font-size: var(--text-xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-xs);
+        }
+
+        .whiskey-type {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .whiskey-attributes {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .attribute {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .flavor-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
+        }
+
+        .flavor-tag {
+            background-color: var(--background-secondary);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+        }
+
+        .predicted-rating {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: var(--space-md);
+            border-top: 1px solid var(--background-secondary);
+        }
+
+        .rating-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .rating-value {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+        }
+
+        .rating-stars {
+            color: var(--primary-color);
+            font-size: var(--text-lg);
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .filter-header h3 {
+            font-family: var(--font-primary);
+            font-size: var(--text-2xl);
+            color: var(--secondary-color);
+        }
+
+        .filter-options {
+            display: flex;
+            gap: var(--space-lg);
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-label {
+            display: block;
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 2px solid #E0E0E0;
+            border-radius: var(--radius-md);
+            font-family: var(--font-secondary);
+            font-size: var(--text-base);
+            background-color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: var(--font-secondary);
+            font-weight: var(--font-semibold);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            padding: var(--space-2xl) 0;
+            margin-top: var(--space-3xl);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-2xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .footer-section h3,
+        .footer-section h4 {
+            font-family: var(--font-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-section p {
+            opacity: 0.8;
+            line-height: var(--leading-relaxed);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: var(--space-sm);
+            opacity: 0.8;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: var(--space-xl);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.6;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-3xl);
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-state-icon {
+            font-size: var(--text-5xl);
+            margin-bottom: var(--space-lg);
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-family: var(--font-primary);
+            font-size: var(--text-2xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-md);
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xl);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>Whiskey Hub ML</h1>
+                <span class="nav-tagline">AI-Powered Recommendations</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="recommendations.html" class="nav-link active">Recommendations</a></li>
+                <li class="nav-item"><a href="flavor-profile.html" class="nav-link">Flavor Profile</a></li>
+                <li class="nav-item"><a href="rating-prediction.html" class="nav-link">Rating Predictor</a></li>
+                <li class="nav-item"><a href="sensitivity-analysis.html" class="nav-link">Taste Insights</a></li>
+                <li class="nav-item"><a href="gift-guide.html" class="nav-link">Gift Guide</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>Your Personalized Recommendations</h1>
+            <p>AI-powered suggestions based on your unique taste profile and rating history</p>
+        </div>
+
+        <!-- User Profile Section -->
+        <div class="user-profile-section">
+            <div class="profile-header">
+                <div class="profile-info">
+                    <h2>Your Whiskey Profile</h2>
+                    <p>Based on collaborative filtering and content-based analysis</p>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="totalRatings">6</span>
+                        <span class="stat-label">Whiskeys Rated</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="avgRating">4.3</span>
+                        <span class="stat-label">Average Rating</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="accuracy">95%</span>
+                        <span class="stat-label">Prediction Accuracy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ML Status -->
+        <div class="ml-status loading" id="mlStatus">
+            <div class="loading-spinner"></div>
+            <h3>Running ML Models...</h3>
+            <p>Analyzing your taste preferences and generating personalized recommendations</p>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section" id="filterSection" style="display: none;">
+            <div class="filter-header">
+                <h3>Refine Recommendations</h3>
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+            </div>
+            <div class="filter-options">
+                <div class="filter-group">
+                    <label class="filter-label" for="typeFilter">Whiskey Type</label>
+                    <select class="filter-select" id="typeFilter" onchange="applyFilters()">
+                        <option value="">All Types</option>
+                        <option value="Single Malt Scotch">Single Malt Scotch</option>
+                        <option value="Bourbon">Bourbon</option>
+                        <option value="Irish Whiskey">Irish Whiskey</option>
+                        <option value="Rye Whiskey">Rye Whiskey</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="priceFilter">Price Range</label>
+                    <select class="filter-select" id="priceFilter" onchange="applyFilters()">
+                        <option value="">All Prices</option>
+                        <option value="$">$ (Under $40)</option>
+                        <option value="$$">$$ ($40-$80)</option>
+                        <option value="$$$">$$$ (Over $80)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="sortFilter">Sort By</label>
+                    <select class="filter-select" id="sortFilter" onchange="applyFilters()">
+                        <option value="score">Match Score</option>
+                        <option value="rating">Predicted Rating</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations Grid -->
+        <div class="recommendations-grid" id="recommendationsGrid" style="display: none;">
+            <!-- Recommendations will be populated here -->
+        </div>
+
+        <!-- Empty State (shown when no recommendations) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-state-icon">🥃</div>
+            <h3>No Recommendations Found</h3>
+            <p>Try adjusting your filters or rate more whiskeys to improve recommendations</p>
+            <a href="flavor-profile.html" class="btn btn-primary">Build Your Flavor Profile</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Whiskey Hub ML</h3>
+                    <p>Advanced machine learning for personalized whiskey recommendations. Discover new favorites based on your unique taste profile.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <ul>
+                        <li>Personalized Recommendations</li>
+                        <li>Rating Predictions</li>
+                        <li>Flavor Profile Matching</li>
+                        <li>Sensitivity Analysis</li>
+                        <li>Gift Suggestions</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Technology</h4>
+                    <ul>
+                        <li>Machine Learning Models</li>
+                        <li>Collaborative Filtering</li>
+                        <li>Content-Based Analysis</li>
+                        <li>SHAP Explanations</li>
+                        <li>Real-Time Processing</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Whiskey Hub ML Demo. Powered by advanced ML algorithms.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let allRecommendations = [];
+        let filteredRecommendations = [];
+
+        // Initialize page
+        async function initializePage() {
+            // Update user stats
+            updateUserStats();
+            
+            // Simulate ML processing
+            await MLSimulator.simulateProcessing(2000, 3000);
+            
+            // Get recommendations
+            allRecommendations = MLSimulator.getCollaborativeRecommendations('demo_user', 12);
+            filteredRecommendations = [...allRecommendations];
+            
+            // Update UI
+            document.getElementById('mlStatus').style.display = 'none';
+            document.getElementById('filterSection').style.display = 'block';
+            document.getElementById('recommendationsGrid').style.display = 'grid';
+            
+            // Display recommendations
+            displayRecommendations();
+        }
+
+        // Update user statistics
+        function updateUserStats() {
+            const db = JSON.parse(localStorage.getItem('whiskeyDatabase'));
+            const userRatings = db.userRatings.filter(r => r.userId === 'demo_user');
+            
+            document.getElementById('totalRatings').textContent = userRatings.length;
+            
+            const avgRating = userRatings.reduce((sum, r) => sum + r.rating, 0) / userRatings.length;
+            document.getElementById('avgRating').textContent = avgRating.toFixed(1);
+        }
+
+        // Display recommendations
+        function displayRecommendations() {
+            const grid = document.getElementById('recommendationsGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredRecommendations.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            grid.innerHTML = filteredRecommendations.map(whiskey => `
+                <div class="whiskey-card fade-in" onclick="showWhiskeyDetails(${whiskey.id})">
+                    <div class="whiskey-image">
+                        <span>🥃</span>
+                        <div class="recommendation-badge">${whiskey.matchPercentage}% Match</div>
+                    </div>
+                    <div class="whiskey-details">
+                        <h3 class="whiskey-name">${whiskey.name}</h3>
+                        <p class="whiskey-type">${whiskey.type}</p>
+                        <div class="whiskey-attributes">
+                            <span class="attribute">Proof: ${whiskey.proof}</span>
+                            <span class="attribute">${whiskey.priceCategory}</span>
+                        </div>
+                        <div class="flavor-tags">
+                            ${whiskey.tastingNotes.slice(0, 3).map(note => 
+                                `<span class="flavor-tag">${note}</span>`
+                            ).join('')}
+                        </div>
+                        <div class="predicted-rating">
+                            <span class="rating-label">Predicted Rating</span>
+                            <div>
+                                <span class="rating-value">${whiskey.predictedRating}</span>
+                                <span class="rating-stars">${getStars(whiskey.predictedRating)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get star rating display
+        function getStars(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+            const emptyStars = 5 - fullStars - halfStar;
+            
+            return '★'.repeat(fullStars) + '☆'.repeat(halfStar) + '☆'.repeat(emptyStars);
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const typeFilter = document.getElementById('typeFilter').value;
+            const priceFilter = document.getElementById('priceFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            // Filter recommendations
+            filteredRecommendations = allRecommendations.filter(whiskey => {
+                const typeMatch = !typeFilter || whiskey.type === typeFilter;
+                const priceMatch = !priceFilter || whiskey.priceCategory === priceFilter;
+                return typeMatch && priceMatch;
+            });
+            
+            // Sort recommendations
+            switch (sortFilter) {
+                case 'rating':
+                    filteredRecommendations.sort((a, b) => b.predictedRating - a.predictedRating);
+                    break;
+                case 'price-low':
+                    filteredRecommendations.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    filteredRecommendations.sort((a, b) => b.price - a.price);
+                    break;
+                default: // 'score'
+                    filteredRecommendations.sort((a, b) => b.recommendationScore - a.recommendationScore);
+            }
+            
+            displayRecommendations();
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('priceFilter').value = '';
+            document.getElementById('sortFilter').value = 'score';
+            filteredRecommendations = [...allRecommendations];
+            displayRecommendations();
+        }
+
+        // Show whiskey details (placeholder for modal/detail view)
+        function showWhiskeyDetails(whiskeyId) {
+            // In a real app, this would show a modal or navigate to a detail page
+            console.log('Show details for whiskey:', whiskeyId);
+            alert('Whiskey details view would open here. In production, this would show detailed information, user reviews, and purchase options.');
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', initializePage);
+    </script>
+</body>
+</html>
