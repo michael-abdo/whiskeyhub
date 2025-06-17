@@ -9,19 +9,20 @@ This module contains:
 - Common algorithms and helper functions
 """
 
-# Imports will be added as components are built
-# from .similarity import calculate_user_similarity, calculate_item_similarity
-# from .matrix_operations import sparse_cosine_similarity, sparse_euclidean_distance
-# from .caching import CacheManager, cached_function
-# from .helpers import normalize_features, handle_missing_values
+from .similarity import (
+    SimilarityCalculator, 
+    CachedSimilarityCalculator,
+    calculate_user_similarity, 
+    calculate_item_similarity,
+    find_neighbors,
+    sparse_cosine_similarity
+)
 
 __all__ = [
-    # "calculate_user_similarity",
-    # "calculate_item_similarity", 
-    # "sparse_cosine_similarity",
-    # "sparse_euclidean_distance",
-    # "CacheManager",
-    # "cached_function",
-    # "normalize_features",
-    # "handle_missing_values",
+    "SimilarityCalculator",
+    "CachedSimilarityCalculator", 
+    "calculate_user_similarity",
+    "calculate_item_similarity",
+    "find_neighbors", 
+    "sparse_cosine_similarity",
 ]

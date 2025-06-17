@@ -9,17 +9,22 @@ This module provides:
 - Statistical significance testing
 """
 
-# Imports will be added as components are built
-# from .metrics import evaluate_model, calculate_rmse, calculate_precision_at_k
-# from .cross_validation import cross_validate, grid_search
-# from .ab_testing import ABTest, statistical_significance
+from .metrics import (
+    RecommendationEvaluator,
+    ABTester,
+    evaluate_model_performance,
+    calculate_rmse,
+    calculate_precision_at_k,
+    calculate_recall_at_k,
+    compare_models
+)
 
 __all__ = [
-    # "evaluate_model",
-    # "calculate_rmse", 
-    # "calculate_precision_at_k",
-    # "cross_validate",
-    # "grid_search",
-    # "ABTest",
-    # "statistical_significance",
+    "RecommendationEvaluator",
+    "ABTester", 
+    "evaluate_model_performance",
+    "calculate_rmse",
+    "calculate_precision_at_k",
+    "calculate_recall_at_k",
+    "compare_models",
 ]
