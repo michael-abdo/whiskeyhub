@@ -1,0 +1,9 @@
+SPARSITY ANALYSIS RESULTS
+==================================================
+
+total_ratings: 3348
+unique_users: 30
+unique_whiskeys: 191
+sparsity: 0.4157068062827225
+avg_ratings_per_user: 111.6
+avg_ratings_per_whiskey: 17.528795811518325

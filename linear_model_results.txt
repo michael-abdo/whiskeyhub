@@ -1,0 +1,23 @@
+LINEAR REGRESSION MODEL RESULTS
+==================================================
+
+Model: Linear Regression
+Features: proof, price, age, complexity, profiness, viscocity, finish_duration
+Training samples: 41
+Test samples: 11
+
+Performance Metrics:
+Train RMSE: 0.743
+Train R²: 0.771
+Test RMSE: 0.613
+Test R²: 0.765
+CV RMSE: 1.023
+
+Feature Coefficients:
+  proof: 0.065
+  price: -0.088
+  age: 0.273
+  complexity: 0.772
+  profiness: -0.177
+  viscocity: 0.082
+  finish_duration: 0.612
