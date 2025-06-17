@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # CSV data path
-data_path = "data/WhiskeyHubMySQL_6_13_2025_pt2/"
+data_path = "../data/WhiskeyHubMySQL_6_13_2025_pt2/"
 
 # Read CSV files
 try:
@@ -58,7 +58,7 @@ if len(pours) > 0 and len(notes) > 0:
         print(f"  - + Whiskeys: {len(df)} rows")
     
     # Save merged data
-    df.to_csv("full_joined.csv", index=False)
+    df.to_csv("../results/full_joined.csv", index=False)
     print(f"\n✅ Merged data saved to full_joined.csv ({len(df)} rows, {len(df.columns)} columns)")
     
     # Show sample of columns

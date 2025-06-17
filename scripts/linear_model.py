@@ -11,7 +11,7 @@ import seaborn as sns
 print("📊 LINEAR REGRESSION MODEL FOR WHISKEY RATINGS")
 print("=" * 50)
 print("\n📂 Loading data...")
-df = pd.read_csv("full_joined.csv")
+df = pd.read_csv("../results/full_joined.csv")
 
 # Check available features
 print("\n🔍 Checking available features...")
@@ -133,7 +133,7 @@ plt.ylabel('Predicted Rating')
 plt.title('Linear Regression: Actual vs Predicted Ratings')
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('linear_model_predictions.png')
+plt.savefig('../results/linear_model_predictions.png')
 plt.close()
 
 # 2. Feature importance bar plot
@@ -142,7 +142,7 @@ plt.barh(feature_importance['feature'], feature_importance['abs_coefficient'])
 plt.xlabel('Absolute Coefficient Value')
 plt.title('Feature Importance in Linear Regression Model')
 plt.tight_layout()
-plt.savefig('linear_model_feature_importance.png')
+plt.savefig('../results/linear_model_feature_importance.png')
 plt.close()
 
 # 3. Residuals plot
@@ -155,7 +155,7 @@ plt.ylabel('Residuals')
 plt.title('Residual Plot')
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('linear_model_residuals.png')
+plt.savefig('../results/linear_model_residuals.png')
 plt.close()
 
 # Save results
@@ -175,7 +175,7 @@ results = {
 }
 
 # Save results to file
-with open('linear_model_results.txt', 'w') as f:
+with open('../results/linear_model_results.txt', 'w') as f:
     f.write("LINEAR REGRESSION MODEL RESULTS\n")
     f.write("=" * 50 + "\n\n")
     f.write(f"Model: {results['model_type']}\n")

@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 # Load the merged data
-df = pd.read_csv("full_joined.csv")
+df = pd.read_csv("../results/full_joined.csv")
 
 print("📊 DATA SPARSITY ANALYSIS")
 print("=" * 50)
@@ -87,7 +87,7 @@ results = {
 }
 
 # Save to file
-with open('sparsity_analysis_results.txt', 'w') as f:
+with open('../results/sparsity_analysis_results.txt', 'w') as f:
     f.write("SPARSITY ANALYSIS RESULTS\n")
     f.write("=" * 50 + "\n\n")
     for key, value in results.items():
